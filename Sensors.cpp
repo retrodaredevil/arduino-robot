@@ -3,6 +3,7 @@
 //
 
 #include "Sensors.h"
+#include "Util.h"
 
 const double POW2_16 = pow(2, 16);
 
@@ -23,6 +24,7 @@ double accelX, accelY, accelZ;
 
 // Variables for the heading
 uint32_t turnAngle = 0;
+double headingOffset = 0;
 int16_t gyroOffset;
 uint32_t gyroLastUpdate = 0;
 
@@ -121,7 +123,11 @@ void updateGyro(){
 }
 double getRobotHeading(){
 //	return (((int32_t)turnAngle >> 16) * 360) >> 16;
-	return (((int32_t)turnAngle / POW2_16) * 360.0) / POW2_16;
+	return mod((((int32_t)turnAngle / POW2_16) * 360.0) / POW2_16 + headingOffset, 360);
+}
+void setRobotHeading(double heading){
+	turnAngle = 0;
+	headingOffset = heading;
 }
 
 uint8_t getFrontLeftProximity() { return frontLeftProximity; }

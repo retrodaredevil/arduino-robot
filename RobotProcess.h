@@ -7,7 +7,7 @@
 
 #include "Util.h"
 class RobotProcess;
-#include "ProcessMod.h"
+#include "ProcessListener.h"
 
 struct RobotProcess{
 	virtual ~RobotProcess(){};
@@ -18,7 +18,7 @@ struct RobotProcess{
 	virtual void end()=0;
 	virtual bool isDone()=0;
 	virtual void setDone(bool done = true)=0;
-	virtual void addProcessMod(ProcessMod *processMod)=0;
+	virtual void addProcessListener(ProcessListener *processListener)=0;
 	/**
 	 *
 	 * @param nextProcess The next process.
@@ -51,20 +51,20 @@ private:
 	bool hasEndedAtLeastOnce = false; // never set back to false
 	bool started = false;
 	RobotProcess *nextProcess = nullptr;
-	Node<ProcessMod*> *modsLinkedList = nullptr;
+	Node<ProcessListener*> *listenerLinkedList = nullptr;
 protected:
 	SimpleRobotProcess(bool canRecycle = false, RobotProcess *nextProcess = nullptr);
 	virtual void onStart()=0;
 	/**
-	 * Called before all ProcessMods are updated
+	 * Called before all ProcessListeners are updated
 	 */
 	virtual void onUpdate()=0;
 	/**
-	 * Called after all ProcessMods are updated
+	 * Called after all ProcessListeners are updated
 	 */
 	virtual void onLateUpdate()=0;
 	/**
-	 * Called before all ProcessMods are ended
+	 * Called before all ProcessListeners are ended
 	 * @param wasPeaceful true if the reason this ending was because isDone() is true. (Normally true)
 	 */
 	virtual void onEnd(bool wasPeaceful)=0;
@@ -76,7 +76,7 @@ public:
 	void end() override;
 	bool isDone() override;
 	void setDone(bool done = true) override;
-	void addProcessMod(ProcessMod *processMod) override;
+	void addProcessListener(ProcessListener *processListener) override;
 	RobotProcess* setNextProcess(RobotProcess *nextProcess) override;
 	RobotProcess* getNextProcess() override;
 };

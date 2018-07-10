@@ -33,7 +33,7 @@ SimpleRobotProcess::SimpleRobotProcess(bool canRecycle, RobotProcess *nextProces
 
 }
 SimpleRobotProcess::~SimpleRobotProcess() {
-	delete modsLinkedList;
+	delete listenerLinkedList;
 }
 void SimpleRobotProcess::update() {
 	if(!started){
@@ -45,15 +45,15 @@ void SimpleRobotProcess::update() {
 		onStart();
 	}
 	onUpdate();
-	for(Node<ProcessMod*> *mod = modsLinkedList; mod != nullptr; mod = mod->next){
-		mod->element->update(this);
+	for(Node<ProcessListener*> *listenerNode = listenerLinkedList; listenerNode != nullptr; listenerNode = listenerNode->next){
+		listenerNode->element->update(this);
 	}
 	onLateUpdate();
 }
 void SimpleRobotProcess::end() {
 	onEnd(done); // we ended peacefully if done is true
-	for(Node<ProcessMod*> *mod = modsLinkedList; mod != nullptr; mod = mod->next){
-		mod->element->end(this);
+	for(Node<ProcessListener*> *listenerNode = listenerLinkedList; listenerNode != nullptr; listenerNode = listenerNode->next){
+		listenerNode->element->end(this);
 	}
 	started = false;
 	hasEndedAtLeastOnce = true;
@@ -64,8 +64,8 @@ bool SimpleRobotProcess::isDone() {
 void SimpleRobotProcess::setDone(bool done) {
 	this->done = done;
 }
-void SimpleRobotProcess::addProcessMod(ProcessMod *processMod) {
-	modsLinkedList->add(processMod);
+void SimpleRobotProcess::addProcessListener(ProcessListener *processListener) {
+	listenerLinkedList->add(processListener);
 }
 long SimpleRobotProcess::getProcessTime() {
 	return millis() - startMillis;

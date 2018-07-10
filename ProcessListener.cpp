@@ -2,12 +2,12 @@
 // Created by josh on 7/9/18.
 //
 
-#include "ProcessMod.h"
+#include "ProcessListener.h"
 
-SimpleProcessMod::SimpleProcessMod(bool removeAfterEnd) : removeAfterEnd(removeAfterEnd){
+SimpleProcessListener::SimpleProcessListener(bool removeAfterEnd) : removeAfterEnd(removeAfterEnd){
 }
 
-void SimpleProcessMod::update(RobotProcess *robotProcess) {
+void SimpleProcessListener::update(RobotProcess *robotProcess) {
 	if(!started){
 		done = false;
 		started = true;
@@ -15,12 +15,12 @@ void SimpleProcessMod::update(RobotProcess *robotProcess) {
 	}
 	onUpdate(robotProcess);
 }
-void SimpleProcessMod::end(RobotProcess *robotProcess) {
+void SimpleProcessListener::end(RobotProcess *robotProcess) {
 	onEnd(robotProcess);
 	started = false;
 	done = false;
 	hasEndedAtLeastOneTime = true;
 }
-bool SimpleProcessMod::isDone() {
+bool SimpleProcessListener::isDone() {
 	return done || (hasEndedAtLeastOneTime && removeAfterEnd);
 }

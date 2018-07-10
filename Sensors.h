@@ -31,5 +31,6 @@ int32_t getAccelerometerY();
 int32_t getAccelerometerZ();
 
 double getRobotHeading();
+void setRobotHeading(double heading);
 
 #endif //SUMO_ROBOT_V2_SENSORS_H

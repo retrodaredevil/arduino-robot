@@ -23,20 +23,20 @@ void loop() {
 //	Serial.print(F("\t"));
 //	Serial.print((int) robot.getDrive()->getRightDistance());
 
-	Serial.print((int) getAccelerometerX());
-	Serial.print(F("\t"));
-	Serial.print((int) getAccelerometerY());
-	Serial.print(F("\t"));
-	Serial.print((int) getAccelerometerZ());
-	Serial.println();
+//	Serial.print((int) getAccelerometerX());
+//	Serial.print(F("\t"));
+//	Serial.print((int) getAccelerometerY());
+//	Serial.print(F("\t"));
+//	Serial.print((int) getAccelerometerZ());
+//	Serial.println();
+//
+//	Serial.print((int) isLeftOnLine());
+//	Serial.print(F("\t"));
+//	Serial.print((int) isCenterOnLine());
+//	Serial.print(F("\t"));
+//	Serial.print((int) isRightOnLine());
+//	Serial.println();
+//	Serial.println(getRobotHeading());
 
-	Serial.print((int) isLeftOnLine());
-	Serial.print(F("\t"));
-	Serial.print((int) isCenterOnLine());
-	Serial.print(F("\t"));
-	Serial.print((int) isRightOnLine());
-	Serial.println();
-	Serial.println(getRobotHeading());
-
-	delay(20);
+	delay(10);
 }

@@ -2,22 +2,22 @@
 // Created by josh on 7/9/18.
 //
 
-#ifndef SUMO_ROBOT_V2_PROCESSMOD_H
-#define SUMO_ROBOT_V2_PROCESSMOD_H
+#ifndef SUMO_ROBOT_V2_PROCESSLISTENER_H
+#define SUMO_ROBOT_V2_PROCESSLISTENER_H
 
-class ProcessMod;
+class ProcessListener;
 #include "RobotProcess.h"
 
 /**
- * A ProcessMod usually belongs to a RobotProcess. The RobotProcess should update all of its "mods" when it updates
+ * A ProcessListener usually belongs to a RobotProcess. The RobotProcess should update all of its "listeners" when it updates
  */
-class ProcessMod{
+class ProcessListener{
 public:
 	/**
 	 * This method is called after a RobotProcess is updated. This method may call methods of the RobotProcess that owns
 	 * it and is even allowed to call setDone().
 	 * <br/>
-	 * When this method is called, the RobotProcess that has this ProcessMod should be updated enough to be able to
+	 * When this method is called, the RobotProcess that has this ProcessListener should be updated enough to be able to
 	 * change things like speed, etc, but may later after this method is called use the state this method changed
 	 * (or didn't change) to actually do something like set the speed of motors.
 	 */
@@ -30,20 +30,20 @@ public:
 
 	/**
 	 * This is called and checked frequently when the RobotProcess is being updated. This can also be used
-	 * to remove this ProcessMod after end is called (this is recommended) although, note that after end is called,
+	 * to remove this ProcessListener after end is called (this is recommended) although, note that after end is called,
 	 * it's likely that this method won't be called for some time.
-	 * @return true if this ProcessMod is done and should be removed from the RobotProcess
+	 * @return true if this ProcessListener is done and should be removed from the RobotProcess
 	 */
 	virtual bool isDone()=0;
 };
-class SimpleProcessMod : public ProcessMod{
+class SimpleProcessListener : public ProcessListener{
 private:
 	const bool removeAfterEnd;
 	bool started = false;
 	bool done = false;
 	bool hasEndedAtLeastOneTime = false; // only set to true never set back to false
 protected:
-	SimpleProcessMod(bool removeAfterEnd = true);
+	SimpleProcessListener(bool removeAfterEnd = true);
 public:
 	void update(RobotProcess *robotProcess) override;
 	virtual void onStart(RobotProcess *robotProcess);
@@ -53,4 +53,4 @@ public:
 	bool isDone() override;
 };
 
-#endif //SUMO_ROBOT_V2_PROCESSMOD_H
+#endif //SUMO_ROBOT_V2_PROCESSLISTENER_H
