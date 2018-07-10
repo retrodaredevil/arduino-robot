@@ -14,4 +14,5 @@ void initRobot();
  */
 void update();
 void debug(String line1, String line2 = "");
+void throwError(String line1, String line2);
 #endif //SUMO_ROBOT_V2_ROBOT_H

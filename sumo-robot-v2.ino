@@ -16,6 +16,7 @@ void setup() {
 }
 
 void loop() {
+//	throwError(F("Stops"), F("Program"));
 	debug(F("Looping"), String(millis() / 1000));
 	update();
 //	Serial.print((int) robot.getDrive()->getLeftDistance());

@@ -4,6 +4,7 @@
 #include "Robot.h"
 #include "Sensors.h"
 #include "RobotProcess.h"
+#include "DriveProcesses.h"
 
 String currentLine1 = "";
 String currentLine2 = "";
@@ -12,6 +13,7 @@ Zumo32U4LCD lcd;
 
 void initRobot(){
 	initSensors();
+	currentProcess = new TankDistanceDrive(1, 40, 40);
 }
 void update() {
 	updateSensors();
@@ -37,5 +39,14 @@ void debug(String line1, String line2) {
 		currentLine2 = line2;
 
 //		Serial.println("updating lines");
+	}
+}
+void throwError(String line1, String line2){
+	debug(line1, line2);
+	while(1){
+		Serial.println(line1);
+		Serial.println(line2);
+		Serial.println();
+		delay(1000);
 	}
 }

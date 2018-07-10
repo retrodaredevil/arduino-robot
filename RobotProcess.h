@@ -4,14 +4,13 @@
 
 #ifndef SUMO_ROBOT_V2_ROBOTPROCESS_H
 #define SUMO_ROBOT_V2_ROBOTPROCESS_H
+
+#include "Util.h"
 class RobotProcess;
 #include "ProcessMod.h"
 
-class RobotProcess{
-protected:
-	RobotProcess(){}
-public:
-	virtual ~RobotProcess()=0;
+struct RobotProcess{
+	virtual ~RobotProcess(){};
 	virtual void update()=0;
 	/**
 	 * This method is called when this process is forcefully ended and when it ended because isDone() returned true
@@ -19,7 +18,7 @@ public:
 	virtual void end()=0;
 	virtual bool isDone()=0;
 	virtual void setDone(bool done = true)=0;
-	virtual void addProcessMod(ProcessMod *processMod);
+	virtual void addProcessMod(ProcessMod *processMod)=0;
 	/**
 	 *
 	 * @param nextProcess The next process.
@@ -44,15 +43,15 @@ public:
 	RobotProcess* getFirstProcess();
 };
 
-class SimpleRobotProcess : public RobotProcess {
+class SimpleRobotProcess : virtual public RobotProcess {
 private:
 	const bool canRecycle;
-	const long startMillis;
+	long startMillis;
 	bool done = false;
-	bool hasBeenDoneAtLeastOnce = false; // never set back to false
+	bool hasEndedAtLeastOnce = false; // never set back to false
 	bool started = false;
 	RobotProcess *nextProcess = nullptr;
-	std::list<ProcessMod*> mods;
+	Node<ProcessMod*> *modsLinkedList = nullptr;
 protected:
 	SimpleRobotProcess(bool canRecycle = false, RobotProcess *nextProcess = nullptr);
 	virtual void onStart()=0;
@@ -76,9 +75,25 @@ public:
 	void update() override;
 	void end() override;
 	bool isDone() override;
-	void setDone(bool done) override;
+	void setDone(bool done = true) override;
 	void addProcessMod(ProcessMod *processMod) override;
 	RobotProcess* setNextProcess(RobotProcess *nextProcess) override;
 	RobotProcess* getNextProcess() override;
+};
+
+/**
+ * Represents a RobotProcess that should end when getTimeLeft() is less than or equal to 0
+ */
+class TimedRobotProcess : virtual public RobotProcess {
+public:
+	virtual long getTimeLeft()=0;
+};
+class SimpleTimedRobotProcess : public SimpleRobotProcess, public TimedRobotProcess{
+private:
+	const long timeToLast;
+protected:
+	SimpleTimedRobotProcess(long timeToLast);
+public:
+	long getTimeLeft() override;
 };
 #endif //SUMO_ROBOT_V2_ROBOTPROCESS_H

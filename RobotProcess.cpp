@@ -3,6 +3,9 @@
 //
 
 #include "RobotProcess.h"
+#include "Robot.h"
+
+#include <Arduino.h>
 
 // RobotProcessBuilder
 RobotProcessBuilder::RobotProcessBuilder() {
@@ -30,22 +33,30 @@ SimpleRobotProcess::SimpleRobotProcess(bool canRecycle, RobotProcess *nextProces
 
 }
 SimpleRobotProcess::~SimpleRobotProcess() {
-
+	delete modsLinkedList;
 }
 void SimpleRobotProcess::update() {
 	if(!started){
+		if(hasEndedAtLeastOnce && !canRecycle){
+			throwError(F("starting"), F("again")); // should put program in infinite loop
+		}
 		startMillis = millis();
 		started = true;
 		onStart();
 	}
 	onUpdate();
-	for(ProcessMod *mod : mods){
-		mod->update(this);
+	for(Node<ProcessMod*> *mod = modsLinkedList; mod != nullptr; mod = mod->next){
+		mod->element->update(this);
 	}
 	onLateUpdate();
 }
 void SimpleRobotProcess::end() {
 	onEnd(done); // we ended peacefully if done is true
+	for(Node<ProcessMod*> *mod = modsLinkedList; mod != nullptr; mod = mod->next){
+		mod->element->end(this);
+	}
+	started = false;
+	hasEndedAtLeastOnce = true;
 }
 bool SimpleRobotProcess::isDone() {
 	return done;
@@ -54,7 +65,7 @@ void SimpleRobotProcess::setDone(bool done) {
 	this->done = done;
 }
 void SimpleRobotProcess::addProcessMod(ProcessMod *processMod) {
-	mods.push_back(processMod);
+	modsLinkedList->add(processMod);
 }
 long SimpleRobotProcess::getProcessTime() {
 	return millis() - startMillis;
@@ -65,4 +76,9 @@ RobotProcess* SimpleRobotProcess::setNextProcess(RobotProcess *nextProcess) {
 }
 RobotProcess* SimpleRobotProcess::getNextProcess() {
 	return nextProcess;
+}
+
+SimpleTimedRobotProcess::SimpleTimedRobotProcess(long timeToLast) : timeToLast(timeToLast) {}
+long SimpleTimedRobotProcess::getTimeLeft() {
+	return timeToLast - getProcessTime();
 }
