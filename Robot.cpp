@@ -14,17 +14,14 @@ Zumo32U4LCD lcd;
 void initRobot(){
 	initSensors();
 	setRobotHeading(90);
-	currentProcess = new TankDistanceDrive(1, 20, 20);
-	currentProcess
-			->setNextProcess(new TurnToHeading(180, .5, false))
-			->setNextProcess(new TankDistanceDrive(1, 20, 20))
-			->setNextProcess(new TurnToHeading(270, .5, false))
-			->setNextProcess(new TankDistanceDrive(1, 20, 20))
-			->setNextProcess(new TurnToHeading(0, .5, false))
-			->setNextProcess(new TankDistanceDrive(1, 20, 20))
-			->setNextProcess(new TurnToHeading(90, .5, false))
-			->setNextProcess(new TankDistanceDrive(1, 20, 100))
-			;
+	RobotProcessBuilder builder;
+//	builder.append(new TankDistanceDrive(.2, 10, 10));
+//	builder.append(new TurnToHeading(-90, .2));
+//	builder.append(new TankDistanceDrive(.2, 10, 10));
+//	builder.append(new TurnToHeading(90, 1));
+//	builder.append(new TankDistanceDrive(.1, 5, 5));
+	builder.append(new HeadingDrive(180, .3, 40));
+	currentProcess = builder.getFirstProcess();
 }
 void update() {
 	updateSensors();

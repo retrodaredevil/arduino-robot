@@ -70,13 +70,11 @@ public:
 
 class TurnToHeading : public SimpleRobotProcess {
 private:
-	static const double DONE_DEADBAND_DEGREES = 2; // withing * 2 of this
+	static const double DONE_DEADBAND_DEGREES = 5; // withing * 2 of this
 
-	const double headingValue; // value from constructor
+	const double heading; // value from constructor
 	const double speed;
-	const bool relativeToCurrentHeading; // value from constructor
 
-	double gyroHeading; // set in onStart()
 protected:
 	void onStart() override;
 	void onUpdate() override;
@@ -84,11 +82,26 @@ protected:
 	void onEnd(bool wasPeaceful) override;
 public:
 	/**
-	 * @param heading if relativeToCurrentHeading is false, it will turn to that heading based on the gyro.
-	 *                If relativeToCurrentHeading is true, it will turn that amount of degrees based on current gyro heading.
+	 * @param heading The heading relative to the gyro
+	 * @param speed The speed; A number from 0 to 1
 	 */
-	TurnToHeading(double heading, double speed, bool relativeToCurrentHeading = true);
+	TurnToHeading(double heading, double speed);
 	~TurnToHeading();
+};
+class HeadingDrive : public SimpleRobotProcess {
+private:
+	const double heading;
+	const double speed;
+	const double distance;
+	double leftStart, rightStart;
+protected:
+	void onStart() override;
+	void onUpdate() override;
+	void onLateUpdate() override;
+	void onEnd(bool wasPeaceful) override;
+public:
+	HeadingDrive(double heading, double speed, double distance);
+	~HeadingDrive();
 };
 
 #endif //SUMO_ROBOT_V2_DRIVEPROCESSES_H
