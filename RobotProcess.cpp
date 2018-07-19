@@ -33,7 +33,7 @@ SimpleRobotProcess::SimpleRobotProcess(bool canRecycle, RobotProcess *nextProces
 
 }
 SimpleRobotProcess::~SimpleRobotProcess() {
-	delete listenerLinkedList;
+	delete firstListenerNode;
 }
 void SimpleRobotProcess::update() {
 	if(!started){
@@ -45,15 +45,28 @@ void SimpleRobotProcess::update() {
 		onStart();
 	}
 	onUpdate();
-	for(Node<ProcessListener*> *listenerNode = listenerLinkedList; listenerNode != nullptr; listenerNode = listenerNode->next){
-		listenerNode->element->update(this);
+	Node<ProcessListener*> *lastNode = nullptr;
+	for(Node<ProcessListener*> *listenerNode = firstListenerNode; listenerNode != nullptr; listenerNode = listenerNode->next){
+		ProcessListener *listener = listenerNode->element;
+		listener->update();
+		Serial.println("updated listener");
+		if(listener->isDone()){
+			// remove the node
+			Serial.println("removing listener");
+			if(lastNode == nullptr){
+				this->firstListenerNode = listenerNode->next;
+			} else {
+				lastNode->next = listenerNode->next;
+			}
+		}
+		lastNode = listenerNode;
 	}
 	onLateUpdate();
 }
 void SimpleRobotProcess::end() {
 	onEnd(done); // we ended peacefully if done is true
-	for(Node<ProcessListener*> *listenerNode = listenerLinkedList; listenerNode != nullptr; listenerNode = listenerNode->next){
-		listenerNode->element->end(this);
+	for(Node<ProcessListener*> *listenerNode = firstListenerNode; listenerNode != nullptr; listenerNode = listenerNode->next){
+		listenerNode->element->processEnd();
 	}
 	started = false;
 	hasEndedAtLeastOnce = true;
@@ -64,8 +77,25 @@ bool SimpleRobotProcess::isDone() {
 void SimpleRobotProcess::setDone(bool done) {
 	this->done = done;
 }
-void SimpleRobotProcess::addProcessListener(ProcessListener *processListener) {
-	listenerLinkedList->add(processListener);
+RobotProcess* SimpleRobotProcess::addProcessListener(ProcessListener *processListener) {
+//	Serial.println("adding process listener");
+	if(processListener == nullptr){
+		Serial.println("processListener is null");
+		throwError("listener", "null");
+	}
+	if(firstListenerNode == nullptr){
+		firstListenerNode = new Node<ProcessListener*>(processListener);
+		if(firstListenerNode->element == nullptr){
+			Serial.println("null for some reason idk.");
+			throwError("null 4 a", "reason");
+		}
+	} else {
+		firstListenerNode->add(processListener);
+	}
+//	Serial.println("initializing");
+	processListener->init(this);
+//	Serial.println("done about to return. (good)");
+	return this;
 }
 long SimpleRobotProcess::getProcessTime() {
 	return millis() - startMillis;

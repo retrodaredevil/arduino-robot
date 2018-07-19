@@ -2,25 +2,25 @@
 // Created by josh on 7/10/18.
 //
 
-#ifndef SUMO_ROBOT_V2_UTIL_H
-#define SUMO_ROBOT_V2_UTIL_H
+#ifndef ARDUINO_ROBOT_V2_UTIL_H
+#define ARDUINO_ROBOT_V2_UTIL_H
 
 #include <Arduino.h>
 
 template <class T>
 struct Node{
-	T element;
-	Node *next;
+	const T element;
+	Node<T> *next = nullptr;
 
-	Node(T element);
-	~Node();
+	Node<T>(T element);
+	~Node<T>();
 	void add(T element);
 };
 template <class T>
 Node<T>::Node(T element): element(element) {}
 template <class T>
 Node<T>::~Node(){
-	delete next;
+
 }
 template <class T>
 void Node<T>::add(T element){
@@ -28,7 +28,7 @@ void Node<T>::add(T element){
 	while(last->next != nullptr){
 		last = last->next;
 	}
-	last->next = new Node(element);
+	last->next = new Node<T>(element);
 }
 
 /**
@@ -55,4 +55,4 @@ double mod(double a, double b);
  * @return A positive or negative number that if added to b is the smallest change to get to a.
  */
 double minChange(double a, double b, double wrap);
-#endif //SUMO_ROBOT_V2_UTIL_H
+#endif //ARDUINO_ROBOT_V2_UTIL_H

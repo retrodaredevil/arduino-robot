@@ -8,13 +8,101 @@
 #include "Util.h"
 #include "Sensors.h"
 
-// TankDistanceDrive
-TankDistanceDrive::TankDistanceDrive(double speed, double leftDistance, double rightDistance, bool normalizeLeftAndRight)
-		: speed(speed), leftDistance(leftDistance), rightDistance(rightDistance), normalizeLeftAndRight(normalizeLeftAndRight) {
-}
-TankDistanceDrive::~TankDistanceDrive() {
+//region BasicTankDrive
 
+void BasicTankDrive::setSpeeds(double left, double right) {
+	setLeftSpeed(left);
+	setRightSpeed(right);
 }
+void BasicTankDrive::addSpeedMultiplier(double left, double right) {
+	setLeftSpeed(getLeftSpeed() * left);
+	setRightSpeed(getRightSpeed() * right);
+}
+void BasicTankDrive::addSpeedMultiplier(double multiplier) {
+	addSpeedMultiplier(multiplier, multiplier);
+}
+double BasicTankDrive::getTurnAmount() {
+	double turnAmount;
+	getSpeedDriveValues(getLeftSpeed(), getRightSpeed(), &turnAmount, nullptr);
+	return turnAmount;
+}
+double BasicTankDrive::getHighSpeed() {
+	double left = getLeftSpeed();
+	double right = getRightSpeed();
+	return abs(left) > abs(right) ? left : right;
+}
+void BasicTankDrive::setTurnAmount(double turnAmount) {
+	double left, right;
+	getTankDriveValues(getHighSpeed(), turnAmount, &left, &right);
+	setSpeeds(left, right);
+}
+void BasicTankDrive::setHighSpeed(double speed) {
+	double left = getLeftSpeed();
+	double right = getRightSpeed();
+	if(left > right){
+		right = (right / left) * speed;
+		left = speed;
+	} else {
+		left = (left / right) * speed;
+		right = speed;
+	}
+	setSpeeds(left, right);
+}
+//endregion
+
+//region BasicSpeedDrive
+
+double BasicSpeedDrive::getLeftSpeed() {
+	double speed = getHighSpeed();
+	double turnAmount = getTurnAmount();
+	double left;
+	getTankDriveValues(speed, turnAmount, &left, nullptr);
+	return left;
+}
+double BasicSpeedDrive::getRightSpeed() {
+	double speed = getHighSpeed();
+	double turnAmount = getTurnAmount();
+	double right;
+	getTankDriveValues(speed, turnAmount, nullptr, &right);
+	return right;
+}
+void BasicSpeedDrive::setLeftSpeed(double left) {
+	double right = getRightSpeed();
+	double speed, turnAmount;
+	getSpeedDriveValues(left, right, &speed, &turnAmount);
+	setHighSpeed(speed);
+	setTurnAmount(turnAmount);
+}
+void BasicSpeedDrive::setRightSpeed(double right) {
+	double left = getLeftSpeed();
+	double speed, turnAmount;
+	getSpeedDriveValues(left, right, &speed, &turnAmount);
+	setHighSpeed(speed);
+	setTurnAmount(turnAmount);
+}
+void BasicSpeedDrive::setSpeeds(double left, double right) {
+	double speed, turnAmount;
+	getSpeedDriveValues(left, right, &speed, &turnAmount);
+	setHighSpeed(speed);
+	setTurnAmount(turnAmount);
+}
+void BasicSpeedDrive::addSpeedMultiplier(double multiplier) {
+	setHighSpeed(getHighSpeed() * multiplier);
+}
+void BasicSpeedDrive::addSpeedMultiplier(double left, double right) {
+	double leftSpeed, rightSpeed;
+	getTankDriveValues(getHighSpeed(), getTurnAmount(), &leftSpeed, &rightSpeed);
+	setSpeeds(leftSpeed * left, rightSpeed * right);
+}
+//endregion
+
+//region TankDistanceDrive
+
+TankDistanceDrive::TankDistanceDrive(double speed, double leftDistance, double rightDistance, bool normalizeLeftAndRight)
+		: speed(speed), leftDistance(leftDistance), rightDistance(rightDistance), normalizeLeftAndRight(normalizeLeftAndRight),
+		  SimpleRobotProcess(true) {
+}
+TankDistanceDrive::~TankDistanceDrive() {}
 void TankDistanceDrive::onStart() {
 	leftStart = getLeftDriveDistance();
 	rightStart = getRightDriveDistance();
@@ -70,7 +158,6 @@ void TankDistanceDrive::onLateUpdate() {
 	tankDrive(leftMotorSpeed, rightMotorSpeed);
 }
 void TankDistanceDrive::onEnd(bool wasPeaceful) {
-	tankDrive(0, 0); // TODO Make an optional ProcessListener to do this
 }
 
 double TankDistanceDrive::getLeftSpeed() {
@@ -79,10 +166,13 @@ double TankDistanceDrive::getLeftSpeed() {
 double TankDistanceDrive::getRightSpeed() {
 	return rightMotorSpeed;
 }
-void TankDistanceDrive::addSpeedMultiplier(double left, double right) {
-	leftMotorSpeed *= left;
-	rightMotorSpeed *= right;
+void TankDistanceDrive::setLeftSpeed(double left) {
+	leftMotorSpeed = left;
 }
+void TankDistanceDrive::setRightSpeed(double right) {
+	rightMotorSpeed = right;
+}
+
 double TankDistanceDrive::getLeftDistanceGone() {
 		return (leftDistance < 0 ? -1 : 1)
 	       * (getLeftDriveDistance() - leftStart);
@@ -91,6 +181,7 @@ double TankDistanceDrive::getRightDistanceGone() {
 	return (rightDistance < 0 ? -1 : 1)
 	       * (getRightDriveDistance() - rightStart);
 }
+
 double TankDistanceDrive::getLeftDistanceAway() {
 	return (leftDistance < 0 ? -1 : 1)
 	       * ((leftStart + leftDistance) - getLeftDriveDistance());
@@ -99,9 +190,12 @@ double TankDistanceDrive::getRightDistanceAway() {
 	return (rightDistance < 0 ? -1 : 1)
 	       * ((rightStart + rightDistance) - getRightDriveDistance());
 }
+//endregion
 
-// Turn to Heading
-TurnToHeading::TurnToHeading(double heading, double speed) : heading(heading), speed(speed) {}
+//region TurnToHeading
+
+TurnToHeading::TurnToHeading(double heading, double speed) : heading(heading), speed(speed),
+                                                             SimpleRobotProcess(true) {}
 TurnToHeading::~TurnToHeading() {}
 
 void TurnToHeading::onStart() {}
@@ -115,11 +209,11 @@ void TurnToHeading::onUpdate() {
 }
 void TurnToHeading::onLateUpdate() {}
 void TurnToHeading::onEnd(bool wasPeaceful) {
-	tankDrive(0, 0);
 }
+//endregion
 
+//region HeadingDrive
 
-// HeadingDrive
 HeadingDrive::HeadingDrive(double heading, double speed, double distance): heading(heading), speed(speed), distance(distance) {}
 HeadingDrive::~HeadingDrive() {}
 void HeadingDrive::onStart() {
@@ -128,12 +222,41 @@ void HeadingDrive::onStart() {
 }
 void HeadingDrive::onUpdate() {
 	double change = minChange(heading, getRobotHeading(), 360);
-	speedDrive(speed, change / -10.0);
-	if(abs(getLeftDriveDistance() - leftStart + getRightDriveDistance() - rightStart) / 2.0 > distance){
+	turnAmount = change / -10.0;
+	turnAmount = max(min(turnAmount, 2), -2);
+	highSpeed = speed;
+	if(getDistanceAway() <= 0){
 		setDone();
 	}
 }
-void HeadingDrive::onLateUpdate() {}
-void HeadingDrive::onEnd(bool wasPeaceful) {
-	tankDrive(0, 0);
+void HeadingDrive::onLateUpdate() {
+	speedDrive(highSpeed, turnAmount);
 }
+void HeadingDrive::onEnd(bool wasPeaceful) {
+}
+double HeadingDrive::getHighSpeed() {
+	return highSpeed;
+}
+double HeadingDrive::getTurnAmount() {
+	return turnAmount;
+}
+void HeadingDrive::setHighSpeed(double speed) {
+	this->highSpeed = speed;
+}
+void HeadingDrive::setTurnAmount(double turnAmount) {
+	this->turnAmount = turnAmount;
+}
+
+double HeadingDrive::getDistanceAway() {
+	return distance - getDistanceGone();
+}
+double HeadingDrive::getDistanceGone() {
+	return (getLeftDriveDistance() - leftStart + getRightDriveDistance() - rightStart) / 2.0 ;
+}
+double HeadingDrive::getLeftDistanceAway() { return getDistanceAway(); } // TODO provide actual estimates for left and right distances
+double HeadingDrive::getRightDistanceAway() { return getDistanceAway(); }
+
+double HeadingDrive::getLeftDistanceGone() { return getDistanceGone(); }
+double HeadingDrive::getRightDistanceGone() { return getDistanceGone(); }
+
+//endregion

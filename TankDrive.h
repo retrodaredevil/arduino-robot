@@ -1,8 +1,8 @@
 //
 // Created by josh on 7/7/18.
 //
-#ifndef SUMO_ROBOT_V2_TANKDRIVE_H
-#define SUMO_ROBOT_V2_TANKDRIVE_H
+#ifndef ARDUINO_ROBOT_V2_TANKDRIVE_H
+#define ARDUINO_ROBOT_V2_TANKDRIVE_H
 
 /**
  *
@@ -19,4 +19,15 @@ void speedDrive(double speed, double turnAmount);
 double getLeftDriveDistance();
 double getRightDriveDistance();
 
-#endif //SUMO_ROBOT_V2_TANKDRIVE_H
+/**
+ *
+ */
+void getTankDriveValues(double speed, double turnAmount, double *leftSpeed, double *rightSpeed);
+/**
+ * @param left The left motor speed -1 to 1
+ * @param right The right motor speed -1 to 1
+ * @param speed A pointer or reference to what will be set to the highest speed OR nullptr so it won't be calculated
+ * @param turnAmount A pointer or reference to what will be set to the turn amount OR nullptr so it won't be calculated
+ */
+void getSpeedDriveValues(double left, double right, double *speed, double *turnAmount);
+#endif //ARDUINO_ROBOT_V2_TANKDRIVE_H

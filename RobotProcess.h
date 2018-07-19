@@ -2,8 +2,8 @@
 // Created by josh on 7/7/18.
 //
 
-#ifndef SUMO_ROBOT_V2_ROBOTPROCESS_H
-#define SUMO_ROBOT_V2_ROBOTPROCESS_H
+#ifndef ARDUINO_ROBOT_V2_ROBOTPROCESS_H
+#define ARDUINO_ROBOT_V2_ROBOTPROCESS_H
 
 #include "Util.h"
 class RobotProcess;
@@ -18,7 +18,7 @@ struct RobotProcess{
 	virtual void end()=0;
 	virtual bool isDone()=0;
 	virtual void setDone(bool done = true)=0;
-	virtual void addProcessListener(ProcessListener *processListener)=0;
+	virtual RobotProcess* addProcessListener(ProcessListener *processListener)=0;
 	/**
 	 *
 	 * @param nextProcess The next process.
@@ -51,7 +51,7 @@ private:
 	bool hasEndedAtLeastOnce = false; // never set back to false
 	bool started = false;
 	RobotProcess *nextProcess = nullptr;
-	Node<ProcessListener*> *listenerLinkedList = nullptr;
+	Node<ProcessListener*> *firstListenerNode = nullptr;
 protected:
 	SimpleRobotProcess(bool canRecycle = false, RobotProcess *nextProcess = nullptr);
 	virtual void onStart()=0;
@@ -76,7 +76,7 @@ public:
 	void end() override;
 	bool isDone() override;
 	void setDone(bool done = true) override;
-	void addProcessListener(ProcessListener *processListener) override;
+	RobotProcess* addProcessListener(ProcessListener *processListener) override;
 	RobotProcess* setNextProcess(RobotProcess *nextProcess) override;
 	RobotProcess* getNextProcess() override;
 };
@@ -88,7 +88,7 @@ class TimedRobotProcess : virtual public RobotProcess {
 public:
 	virtual long getTimeLeft()=0;
 };
-class SimpleTimedRobotProcess : public SimpleRobotProcess, public TimedRobotProcess{
+class SimpleTimedRobotProcess : public SimpleRobotProcess, virtual public TimedRobotProcess{
 private:
 	const long timeToLast;
 protected:
@@ -96,4 +96,4 @@ protected:
 public:
 	long getTimeLeft() override;
 };
-#endif //SUMO_ROBOT_V2_ROBOTPROCESS_H
+#endif //ARDUINO_ROBOT_V2_ROBOTPROCESS_H

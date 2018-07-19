@@ -2,12 +2,12 @@
 // Created by josh on 7/9/18.
 //
 
-#ifndef SUMO_ROBOT_V2_CONSTANTS_H
-#define SUMO_ROBOT_V2_CONSTANTS_H
+#ifndef ARDUINO_ROBOT_V2_CONSTANTS_H
+#define ARDUINO_ROBOT_V2_CONSTANTS_H
 
 enum Constants{
 	TRACK_WIDTH = 9.0,
 
 };
 
-#endif //SUMO_ROBOT_V2_CONSTANTS_H
+#endif //ARDUINO_ROBOT_V2_CONSTANTS_H
