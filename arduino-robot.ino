@@ -23,10 +23,14 @@ void setup() {
 //	builder.append(new TankDistanceDrive(.2, 10, 10));
 //	builder.append(new TurnToHeading(90, 1));
 //	builder.append(new TankDistanceDrive(.1, 5, 5));
-	HeadingDrive *drive = new HeadingDrive(-90, 1, 40);
-//	drive->addProcessListener(new SideSensorGetaway(drive))
-	drive->addProcessListener(new InstantStop());
-	builder.append(drive);
+	const double distance = 25;
+	HeadingDrive *up = new HeadingDrive(90, 1, distance);
+	builder.append(up);
+	builder.append(new HeadingDrive(0, 1, distance));
+	builder.append(new HeadingDrive(-90, 1, distance));
+	HeadingDrive *left = new HeadingDrive(180, 1, distance);
+	left->setNextProcess(up); // loop forever
+	builder.append(left);
 	setRobotProcess(builder.getFirstProcess());
 }
 

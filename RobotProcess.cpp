@@ -33,7 +33,7 @@ SimpleRobotProcess::SimpleRobotProcess(bool canRecycle, RobotProcess *nextProces
 
 }
 SimpleRobotProcess::~SimpleRobotProcess() {
-	delete firstListenerNode;
+	delete firstListenerNode; // TODO make this work
 }
 void SimpleRobotProcess::update() {
 	if(!started){
@@ -49,7 +49,6 @@ void SimpleRobotProcess::update() {
 	for(Node<ProcessListener*> *listenerNode = firstListenerNode; listenerNode != nullptr; listenerNode = listenerNode->next){
 		ProcessListener *listener = listenerNode->element;
 		listener->update();
-		Serial.println("updated listener");
 		if(listener->isDone()){
 			// remove the node
 			Serial.println("removing listener");
@@ -69,6 +68,7 @@ void SimpleRobotProcess::end() {
 		listenerNode->element->processEnd();
 	}
 	started = false;
+	done = false;
 	hasEndedAtLeastOnce = true;
 }
 bool SimpleRobotProcess::isDone() {

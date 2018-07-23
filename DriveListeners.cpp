@@ -17,8 +17,6 @@ void SideSensorGetaway::init(RobotProcess *robotProcess) {
 }
 void SideSensorGetaway::onStart() {}
 void SideSensorGetaway::onUpdate() {
-	debug("updating", "yay");
-	Serial.println("Why hello there");
 }
 void SideSensorGetaway::onProcessEnd() {}
 

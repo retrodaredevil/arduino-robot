@@ -25,7 +25,7 @@ void update() {
 		if(currentProcess->isDone()){
 			currentProcess->end();
 			RobotProcess *nextProcess = currentProcess->getNextProcess();
-			delete currentProcess;
+//			delete currentProcess;
 			currentProcess = nextProcess;
 		}
 	}
@@ -45,6 +45,7 @@ void debug(String line1, String line2) {
 	}
 }
 void throwError(String line1, String line2){
+	tankDrive(0, 0);
 	debug(line1, line2);
 	while(1){
 		Serial.println(line1);

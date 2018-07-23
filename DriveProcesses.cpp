@@ -7,6 +7,7 @@
 #include "TankDrive.h"
 #include "Util.h"
 #include "Sensors.h"
+#include "Robot.h"
 
 //region BasicTankDrive
 
@@ -214,13 +215,14 @@ void TurnToHeading::onEnd(bool wasPeaceful) {
 
 //region HeadingDrive
 
-HeadingDrive::HeadingDrive(double heading, double speed, double distance): heading(heading), speed(speed), distance(distance) {}
+HeadingDrive::HeadingDrive(double heading, double speed, double distance): heading(heading), speed(speed), distance(distance), SimpleRobotProcess(true) {}
 HeadingDrive::~HeadingDrive() {}
 void HeadingDrive::onStart() {
 	leftStart = getLeftDriveDistance();
 	rightStart = getRightDriveDistance();
 }
 void HeadingDrive::onUpdate() {
+	debug(String(heading), F("degrees"));
 	double change = minChange(heading, getRobotHeading(), 360);
 	turnAmount = change / -10.0;
 	turnAmount = max(min(turnAmount, 2), -2);
